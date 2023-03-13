@@ -14,11 +14,8 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 app = Flask(__name__)
 @app.route("/qgplugin/api/", methods = ["POST"])
 def get_questions():
-    # context = sys.argv[1]
-    # number = int (sys.argv[2])
-    # q_type = int(sys.argv[3])
-    number = 3
-    q_type = 2
+    number = request.json.get('number')
+    q_type = request.json.get('type')
     context = '''
     Architecturally, the school has a Catholic character. Atop the Main Building's gold dome is a golden statue of the Virgin Mary.
     '''
@@ -52,28 +49,28 @@ def prompt_creator4(context, num=1): #essay
 # AI PREDICT FUNCTION
 def predict_questions(prompt, q_type, number):
     result = []
-    # openai.api_key = os.getenv("OPENAI_API_KEY")    
-    # response = openai.Completion.create(
-    #   model="text-davinci-003",
-    #   prompt=prompt,
-    #   temperature=0.7,
-    #   max_tokens=256,
-    #   top_p=1,
-    #   frequency_penalty=0,
-    #   presence_penalty=0
-    # )   
-    # new = response['choices'][0]['text']
+    openai.api_key = os.getenv("OPENAI_API_KEY")    
+    response = openai.Completion.create(
+        model="text-davinci-003",
+        prompt=prompt,
+        temperature=0.7,
+        max_tokens=256,
+        top_p=1,
+        frequency_penalty=0,
+        presence_penalty=0
+    )   
+    new = response['choices'][0]['text']
 
-    new = '''
-    Q1. The school has a Catholic character?
-    Answer: True 
+    # new = '''
+    # Q1. The school has a Catholic character?
+    # Answer: True 
 
-    Q2. Is there a golden statue of the Virgin Mary atop the Main Building's gold dome?
-    Answer: True
+    # Q2. Is there a golden statue of the Virgin Mary atop the Main Building's gold dome?
+    # Answer: True
 
-    Q3. Is the Main Building's gold dome the only architectural feature with a religious character?
-    Answer: False
-    '''
+    # Q3. Is the Main Building's gold dome the only architectural feature with a religious character?
+    # Answer: False
+    # '''
 
     result = new.split('\n')
 
@@ -97,7 +94,6 @@ def predict_questions(prompt, q_type, number):
 
     # Return a JSON 
     return ques_bank_json
-    # return new
 
 
 if __name__ == '__main__':
