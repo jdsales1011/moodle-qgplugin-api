@@ -16,9 +16,10 @@ app = Flask(__name__)
 def get_questions():
     number = request.json.get('number')
     q_type = request.json.get('type')
-    context = '''
-    Architecturally, the school has a Catholic character. Atop the Main Building's gold dome is a golden statue of the Virgin Mary.
-    '''
+    context = request.json.get('context')
+    # context = '''
+    # Architecturally, the school has a Catholic character. Atop the Main Building's gold dome is a golden statue of the Virgin Mary.
+    # '''
     prompt_creators = {
         1: prompt_creator1(context, number),
         2: prompt_creator2(context, number),
@@ -37,7 +38,7 @@ def prompt_creator1(context, num=1): #identification
     return f"Generate {num} Questions and their short answers as a list from the following text, {context} using the format 'Q1.' and 'Answer:'\n\nQuestions and Answers:"
 
 def prompt_creator2(context, num=1): #true or false
-    return f"Generate {num} true or false questions and their answers as a list from the following text, {context} using the format 'Q1.' and 'Answer:'\n\nQuestions and Answers:"
+    return f"Generate {num} true or false questions and their answers as a list from the following text, {context} using the format 'Q1.' and 'Answer:'. Answer should be either True or False\n\nQuestions and Answers:"
 
 def prompt_creator3(context, num=1): #multiple choice
     return f"Generate {num} multiple choice questions and their answers as a list from the following text, {context} using the format 'Q1.','Choices:' and 'Answer:'\n\nQuestions and Answers:"
