@@ -14,9 +14,13 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 app = Flask(__name__)
 @app.route("/qgplugin/api/", methods = ["POST"])
 def get_questions():
-    number = request.json.get('number')
-    q_type = request.json.get('type')
-    content = request.json.get('content')
+    file = request.files.get('file')
+    filename = file.filename
+    print(filename)
+
+    number = int(request.form.get('number'))
+    q_type = int(request.form.get('type'))
+    content = request.form.get('content')
 
     prompt_creators = {
         1: prompt_creator1(content, number),
