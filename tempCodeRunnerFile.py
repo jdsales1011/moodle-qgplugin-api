@@ -1,10 +1,13 @@
- = '''
-    # Q1. The school has a Catholic character?
-    # Answer: True 
+w = '''
+    Q1. What type of character is the school architecturally?
+    Choices: [A. Catholic, B. Protestant, C. Jewish, D. Atheist]
+    Answer: A. Catholic
 
-    # Q2. Is there a golden statue of the Virgin Mary atop the Main Building's gold dome?
-    # Answer: True
+    Q2. What is atop the Main Building's gold dome?
+    Choices: [A. A cross, B. A bell, C. A golden statue of the Virgin Mary, D. A flag]
+    Answer: C. A golden statue of the Virgin Mary
 
-    # Q3. Is the Main Building's gold dome the only architectural feature with a religious character?
-    # Answer: False
-    # '''
+    Q3. What color is the gold dome?
+    Choices: [A. White, B. Blue, C. Green, D. Gold]
+    Answer: D. Gold
+    '''

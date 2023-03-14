@@ -16,15 +16,13 @@ app = Flask(__name__)
 def get_questions():
     number = request.json.get('number')
     q_type = request.json.get('type')
-    context = request.json.get('context')
-    # context = '''
-    # Architecturally, the school has a Catholic character. Atop the Main Building's gold dome is a golden statue of the Virgin Mary.
-    # '''
+    content = request.json.get('content')
+
     prompt_creators = {
-        1: prompt_creator1(context, number),
-        2: prompt_creator2(context, number),
-        3: prompt_creator3(context, number),
-        4: prompt_creator4(context, number),
+        1: prompt_creator1(content, number),
+        2: prompt_creator2(content, number),
+        3: prompt_creator3(content, number),
+        4: prompt_creator4(content, number),
     }
     prompt = prompt_creators[q_type]
     print(prompt)
@@ -33,18 +31,17 @@ def get_questions():
     return predict_questions(prompt, q_type, number)
 
 
+def prompt_creator1(content, num=1): #identification
+    return f"Generate {num} Questions and their short answers as a list from the following text, {content} using the format 'Q1.' and 'Answer:'\n\nQuestions and Answers:"
 
-def prompt_creator1(context, num=1): #identification
-    return f"Generate {num} Questions and their short answers as a list from the following text, {context} using the format 'Q1.' and 'Answer:'\n\nQuestions and Answers:"
+def prompt_creator2(content, num=1): #true or false
+    return f"Generate {num} true or false questions and their answers as a list from the following text, {content} using the format 'Q1.' and 'Answer:'. Answer should be either True or False\n\nQuestions and Answers:"
 
-def prompt_creator2(context, num=1): #true or false
-    return f"Generate {num} true or false questions and their answers as a list from the following text, {context} using the format 'Q1.' and 'Answer:'. Answer should be either True or False\n\nQuestions and Answers:"
+def prompt_creator3(content, num=1): #multiple choice
+    return f"Generate {num} multiple choice questions and their answers as a list from the following text, {content} using the format 'Q1.','Choices: []' and 'Answer:'\n\nQuestions and Answers:"
 
-def prompt_creator3(context, num=1): #multiple choice
-    return f"Generate {num} multiple choice questions and their answers as a list from the following text, {context} using the format 'Q1.','Choices: []' and 'Answer:'\n\nQuestions and Answers:"
-
-def prompt_creator4(context, num=1): #essay
-    return f"Generate {num} essay questions and the key answers as a list from the following text, {context} using the format 'Q1.' and 'Answer:'\n\nQuestions and Answers:"
+def prompt_creator4(content, num=1): #essay
+    return f"Generate {num} essay questions and the key answers as a list from the following text, {content} using the format 'Q1.' and 'Answer:'\n\nQuestions and Answers:"
 
 
 # AI PREDICT FUNCTION
@@ -91,8 +88,6 @@ def predict_questions(prompt, q_type, number):
                 "answer" : result[i+2].split("Answer:", 1)[1].split(".", 1)[0].strip()
                 }
             ques_bank[int(i/3)+1] = item
-
-        print(result)
 
     else:
         result = [x for x in result if x.strip()]       # TO REMOVE EMPTY NEXT LINES    
