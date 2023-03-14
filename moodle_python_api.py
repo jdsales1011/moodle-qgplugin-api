@@ -22,14 +22,17 @@ def get_questions():
     q_type = int(request.form.get('type'))
     content = request.form.get('content')
 
+    file_content = file.read().decode('utf-8')
+    print("File content: ", file_content)
+
     prompt_creators = {
-        1: prompt_creator1(content, number),
-        2: prompt_creator2(content, number),
-        3: prompt_creator3(content, number),
-        4: prompt_creator4(content, number),
+        1: prompt_creator1(file_content, number),
+        2: prompt_creator2(file_content, number),
+        3: prompt_creator3(file_content, number),
+        4: prompt_creator4(file_content, number),
     }
     prompt = prompt_creators[q_type]
-    print(prompt)
+    # print(prompt)
 
     # PREDICT FUNCTION
     return predict_questions(prompt, q_type, number)
