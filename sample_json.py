@@ -26,6 +26,24 @@ data = {
 data = {
     1: {
         "question": "Zaphod Beeblebrox?",
+        "choices": "[A. A cross, B. A bell, C. A golden statue of the Virgin Mary, D. A flag]",
+        "answer": 'D'
+    },
+    2: {
+        "question": "Zaphod Beeblebrox?",
+        "choices": {
+            'a': "the",
+            'b': "quick",
+            'c': "brown",
+            'd': "fox",
+        },
+        "answer": 'd'
+    }
+}
+
+data = {
+    1: {
+        "question": "Zaphod Beeblebrox?",
         "choices": {
             'a': "the",
             'b': "quick",
