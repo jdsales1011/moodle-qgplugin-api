@@ -4,8 +4,10 @@ from flask import request
 import sys
 import os
 import json
+import io
 
 import openai
+import PyPDF2
 
 os.environ['OPENAI_API_KEY']='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'
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -14,16 +16,34 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 app = Flask(__name__)
 @app.route("/qgplugin/api/", methods = ["POST"])
 def get_questions():
-    file = request.files.get('file')
-    filename = file.filename
-    print(filename)
-
     number = int(request.form.get('number'))
     q_type = int(request.form.get('type'))
-    content = request.form.get('content')
 
-    file_content = file.read().decode('utf-8')
-    print("File content: ", file_content)
+    file = request.files.get('file')
+    file_name, file_extension = os.path.splitext(file.filename)
+    print("File name: ", file_name, "File ext: ", file_extension)
+
+    if (file_extension == ".txt"):
+        file_content = file.read().decode('utf-8')
+
+    elif (file_extension == ".pdf"):
+        # Read the file contents
+        file_contents = file.read()
+
+        # Convert contents to bytes (BytesIO obj)
+        file_bytes = io.BytesIO(file_contents)
+
+        # Read PDF bytes
+        pdf_reader = PyPDF2.PdfReader(file_bytes)
+        file_content = ''
+        for page in range(len(pdf_reader.pages)):
+            file_content += pdf_reader.pages[page].extract_text()
+
+        # Close BytesIO obj
+        file_bytes.close()
+
+    elif (file_extension == ".docx" or file_extension == ".docs"):
+        print("docs")
 
     prompt_creators = {
         1: prompt_creator1(file_content, number),
@@ -32,7 +52,7 @@ def get_questions():
         4: prompt_creator4(file_content, number),
     }
     prompt = prompt_creators[q_type]
-    # print(prompt)
+    print(prompt)
 
     # PREDICT FUNCTION
     return predict_questions(prompt, q_type, number)
@@ -85,6 +105,8 @@ def predict_questions(prompt, q_type, number):
 
     ques_bank = {}
 
+    print(result)
+
     if q_type == 3:             # MULTIPLE CHOICE
         result = [x for x in result if x.strip()]       # TO REMOVE EMPTY NEXT LINES
     
@@ -108,7 +130,6 @@ def predict_questions(prompt, q_type, number):
 
     # Convert dict to JSON
     ques_bank_json = json.dumps(ques_bank)
-    # print(ques_bank_json)
 
     # Return a JSON 
     return ques_bank_json
