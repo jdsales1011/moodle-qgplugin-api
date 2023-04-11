@@ -25,12 +25,7 @@ def get_questions():
 
     number = int(params['number'])
     q_type = int(params['type'])
-    # temp = params['temp']
     files = params['files']
-
-    # print("number: ", number)
-    # print("temp: ", temp)
-    # print("files: ", files)
 
     file_content = ''
 
@@ -62,7 +57,6 @@ def get_questions():
         1: prompt_creator1(file_content, number),
         2: prompt_creator2(file_content, number),
         3: prompt_creator3(file_content, number),
-        4: prompt_creator4(file_content, number),
     }
     prompt = prompt_creators[q_type]
     print(prompt)
@@ -79,9 +73,6 @@ def prompt_creator2(content, num=1): #true or false
 
 def prompt_creator3(content, num=1): #multiple choice
     return f"Generate {num} multiple choice questions and their answers as a list from the following text, {content} using the format 'Q1.','Choices: []' and 'Answer:'\n\nQuestions and Answers:"
-
-def prompt_creator4(content, num=1): #essay
-    return f"Generate {num} essay questions and the key answers as a list from the following text, {content} using the format 'Q1.' and 'Answer:'\n\nQuestions and Answers:"
 
 
 # AI PREDICT FUNCTION
@@ -102,22 +93,33 @@ def predict_questions(prompt, q_type, number):
     # print(new)
 
     new = '''
-    Q1. What type of character is the school architecturally?
-    Choices: [A. Catholic, B. Protestant, C. Jewish, D. Atheist]
-    Answer: A. Catholic
+    Q1. The school has a Catholic character?
+    Answer: True 
 
-    Q2. What is atop the Main Building's gold dome?
-    Choices: [A. A cross, B. A bell, C. A golden statue of the Virgin Mary, D. A flag]
-    Answer: C. A golden statue of the Virgin Mary
+    Q2. Is there a golden statue of the Virgin Mary atop the Main Building's gold dome?
+    Answer: True
 
-    Q3. What color is the gold dome?
-    Choices: [A. White, B. Blue, C. Green, D. Gold]
-    Answer: D. Gold
+    Q3. Is the Main Building's gold dome the only architectural feature with a religious character?
+    Answer: False
     '''
+
+    # new = '''
+    # Q1. What type of character is the school architecturally?
+    # Choices: [A. Catholic, B. Protestant, C. Jewish, D. Atheist]
+    # Answer: A. Catholic
+
+    # Q2. What is atop the Main Building's gold dome?
+    # Choices: [A. A cross, B. A bell, C. A golden statue of the Virgin Mary, D. A flag]
+    # Answer: C. A golden statue of the Virgin Mary
+
+    # Q3. What color is the gold dome?
+    # Choices: [A. White, B. Blue, C. Green, D. Gold]
+    # Answer: D. Gold
+    # '''
 
     result = new.split('\n')
 
-    ques_bank = {}
+    ques_bank = []
 
     print(result)
 
@@ -130,7 +132,7 @@ def predict_questions(prompt, q_type, number):
                 "choices" : result[i+1].split("Choices:", 1)[1].strip(),
                 "answer" : result[i+2].split("Answer:", 1)[1].split(".", 1)[0].strip()
                 }
-            ques_bank[int(i/3)+1] = item
+            ques_bank.append(item)
 
     else:
         result = [x for x in result if x.strip()]       # TO REMOVE EMPTY NEXT LINES    
@@ -140,10 +142,16 @@ def predict_questions(prompt, q_type, number):
                 "question" : result[i].split(".", 1)[1].strip(),
                 "answer" : result[i+1].split("Answer:", 1)[1].strip()
                 }
-            ques_bank[int(i/2)+1] = item
+            ques_bank.append(item)
+
+    ques_bank_json = {
+        "questions": ques_bank
+    }
 
     # Convert dict to JSON
-    ques_bank_json = json.dumps(ques_bank)
+    ques_bank_json = json.dumps(ques_bank_json)
+
+    print("JSON RESULT: ", ques_bank_json)
 
     # Return a JSON 
     return ques_bank_json
