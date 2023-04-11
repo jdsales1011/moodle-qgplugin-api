@@ -31,13 +31,8 @@ data = {
     },
     2: {
         "question": "Zaphod Beeblebrox?",
-        "choices": {
-            'a': "the",
-            'b': "quick",
-            'c': "brown",
-            'd': "fox",
-        },
-        "answer": 'd'
+        "choices": "[A. A cross, B. A bell, C. A golden statue of the Virgin Mary, D. A flag]",
+        "answer": 'D'
     }
 }
 

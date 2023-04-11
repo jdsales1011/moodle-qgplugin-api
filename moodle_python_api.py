@@ -5,6 +5,7 @@ import sys
 import os
 import json
 import io
+import base64
 
 import openai
 import PyPDF2
@@ -16,34 +17,46 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 app = Flask(__name__)
 @app.route("/qgplugin/api/", methods = ["POST"])
 def get_questions():
-    number = int(request.form.get('number'))
-    q_type = int(request.form.get('type'))
+    # Get JSON parameter
+    json_data = request.get_data(as_text=True)
 
-    file = request.files.get('file')
-    file_name, file_extension = os.path.splitext(file.filename)
-    print("File name: ", file_name, "File ext: ", file_extension)
+    # Decode JSON data into dictionary
+    params = json.loads(json_data)
 
-    if (file_extension == ".txt"):
-        file_content = file.read().decode('utf-8')
+    number = int(params['number'])
+    q_type = int(params['type'])
+    # temp = params['temp']
+    files = params['files']
 
-    elif (file_extension == ".pdf"):
-        # Read the file contents
-        file_contents = file.read()
+    # print("number: ", number)
+    # print("temp: ", temp)
+    # print("files: ", files)
 
-        # Convert contents to bytes (BytesIO obj)
-        file_bytes = io.BytesIO(file_contents)
+    file_content = ''
 
-        # Read PDF bytes
-        pdf_reader = PyPDF2.PdfReader(file_bytes)
-        file_content = ''
-        for page in range(len(pdf_reader.pages)):
-            file_content += pdf_reader.pages[page].extract_text()
+    for file in files:
+        file_extension = file['file_name'].split('.')[-1]
+        file_decoded = base64.b64decode(file['file_encoded'])
+        print(file['file_name'])
+        print(file_extension)
 
-        # Close BytesIO obj
-        file_bytes.close()
+        file_content += "\n"
 
-    elif (file_extension == ".docx" or file_extension == ".docs"):
-        print("docs")
+        if (file_extension == "txt"):
+            file_content += file_decoded.decode('utf-8')
+
+        elif (file_extension == "pdf"):
+            # Convert contents to bytes (BytesIO obj)
+            file_bytes = io.BytesIO(file_decoded)
+            pdf_reader = PyPDF2.PdfReader(file_bytes)
+            for page in range(len(pdf_reader.pages)):
+                file_content += pdf_reader.pages[page].extract_text()
+
+            # Close BytesIO obj
+            file_bytes.close()
+
+        elif (file_extension == "docx" or file_extension == "docs"):
+            print("docs")
 
     prompt_creators = {
         1: prompt_creator1(file_content, number),
@@ -74,32 +87,33 @@ def prompt_creator4(content, num=1): #essay
 # AI PREDICT FUNCTION
 def predict_questions(prompt, q_type, number):
     result = []
-    openai.api_key = os.getenv("OPENAI_API_KEY")    
-    response = openai.Completion.create(
-        model="text-davinci-003",
-        prompt=prompt,
-        temperature=0.7,
-        max_tokens=256,
-        top_p=1,
-        frequency_penalty=0,
-        presence_penalty=0
-    )   
-    new = response['choices'][0]['text']
-    print(new)
+    # openai.api_key = os.getenv("OPENAI_API_KEY")    
+    # response = openai.Completion.create(
+    #     model="text-davinci-003",
+    #     prompt=prompt,
+    #     temperature=0.7,
+    #     max_tokens=256,
+    #     top_p=1,
+    #     frequency_penalty=0,
+    #     presence_penalty=0
+    # )   
+    # print("Response: ", response)
+    # new = response['choices'][0]['text']
+    # print(new)
 
-    # new = '''
-    # Q1. What type of character is the school architecturally?
-    # Choices: [A. Catholic, B. Protestant, C. Jewish, D. Atheist]
-    # Answer: A. Catholic
+    new = '''
+    Q1. What type of character is the school architecturally?
+    Choices: [A. Catholic, B. Protestant, C. Jewish, D. Atheist]
+    Answer: A. Catholic
 
-    # Q2. What is atop the Main Building's gold dome?
-    # Choices: [A. A cross, B. A bell, C. A golden statue of the Virgin Mary, D. A flag]
-    # Answer: C. A golden statue of the Virgin Mary
+    Q2. What is atop the Main Building's gold dome?
+    Choices: [A. A cross, B. A bell, C. A golden statue of the Virgin Mary, D. A flag]
+    Answer: C. A golden statue of the Virgin Mary
 
-    # Q3. What color is the gold dome?
-    # Choices: [A. White, B. Blue, C. Green, D. Gold]
-    # Answer: D. Gold
-    # '''
+    Q3. What color is the gold dome?
+    Choices: [A. White, B. Blue, C. Green, D. Gold]
+    Answer: D. Gold
+    '''
 
     result = new.split('\n')
 
