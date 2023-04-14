@@ -69,10 +69,10 @@ def prompt_creator1(content, num=1): #identification
     return f"Generate {num} Questions and their short answers as a list from the following text, {content} using the format 'Q1.' and 'Answer:', Answer must be a direct, concise, short answer. \n\nQuestions and Answers:"
 
 def prompt_creator2(content, num=1): #true or false
-    return f"Generate {num} true or false questions and their answers as a list from the following text, {content} using the format 'Q1.' and 'Answer:'. Phrase question in declarative form. Answer should be either True or False.\n\nQuestions and Answers:"
+    return f"Generate {num} true or false questions and their answers as a list from the following text, {content} using the format 'Q1.' and 'Answer:'. Phrase statements in declarative form. Answers should be either True or False.\n\Statements and Answers:"
 
 def prompt_creator3(content, num=1): #multiple choice
-    return f"Generate {num} multiple choice questions and their answers as a list from the following text, {content} using the format 'Q1.','Choices: []' and 'Answer:'\n\nQuestions and Answers:"
+    return f"Generate a list of {num} multiple choice questions and their answers from the following text, {content} using the format 'Q1.','Choices: []' and 'Answer:'\n\nQuestions and Answers:"
 
 
 # AI PREDICT FUNCTION
@@ -132,10 +132,12 @@ def predict_questions(prompt, q_type, number):
 
     print(result)
 
+    result = [x for x in result if x.strip()]       # TO REMOVE EMPTY NEXT LINES
+
+    length = len(result)
+
     if q_type == 3:             # MULTIPLE CHOICE
-        result = [x for x in result if x.strip()]       # TO REMOVE EMPTY NEXT LINES
-    
-        for i in range(0, number*3, 3):
+        for i in range(0, length, 3):
             item = {
                 "id": int(i/3)+1,
                 "question" : result[i].split(".", 1)[1].strip(),
@@ -144,10 +146,8 @@ def predict_questions(prompt, q_type, number):
                 }
             ques_bank.append(item)
 
-    else:
-        result = [x for x in result if x.strip()]       # TO REMOVE EMPTY NEXT LINES    
-        
-        for i in range(0, number*2, 2):
+    else: 
+        for i in range(0, length, 2):
             item = {
                 "id": int(i/2)+1,
                 "question" : result[i].split(".", 1)[1].strip(),
