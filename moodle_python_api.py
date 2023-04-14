@@ -78,30 +78,39 @@ def prompt_creator3(content, num=1): #multiple choice
 # AI PREDICT FUNCTION
 def predict_questions(prompt, q_type, number):
     result = []
-    # openai.api_key = os.getenv("OPENAI_API_KEY")    
-    # response = openai.Completion.create(
-    #     model="text-davinci-003",
-    #     prompt=prompt,
-    #     temperature=0.7,
-    #     max_tokens=256,
-    #     top_p=1,
-    #     frequency_penalty=0,
-    #     presence_penalty=0
-    # )   
-    # print("Response: ", response)
-    # new = response['choices'][0]['text']
-    # print(new)
+    openai.api_key = os.getenv("OPENAI_API_KEY")    
+    response = openai.Completion.create(
+        model="text-davinci-003",
+        prompt=prompt,
+        temperature=0.7,
+        max_tokens=256,
+        top_p=1,
+        frequency_penalty=0,
+        presence_penalty=0
+    )   
+    print("Response: ", response)
+    new = response['choices'][0]['text']
+    print(new)
 
-    new = '''
-    Q1. The school has a Catholic character?
-    Answer: True 
+    # new = '''
+    # Q1. What was wrong with the computers? 
+    # Answer: Something had gone wrong with the computers. 
+    # Q2. Why did the speaker have to make another plan? 
+    # Answer: The speaker had to make another plan because the assistant had forgotten to make copies of a report needed at nine o'clock.
+    # Q3. Sakto ni?
+    # Answer: Maynta :'))
+    # '''
 
-    Q2. Is there a golden statue of the Virgin Mary atop the Main Building's gold dome?
-    Answer: True
+    # new = '''
+    # Q1. The school has a Catholic character?
+    # Answer: True 
 
-    Q3. Is the Main Building's gold dome the only architectural feature with a religious character?
-    Answer: False
-    '''
+    # Q2. Is there a golden statue of the Virgin Mary atop the Main Building's gold dome?
+    # Answer: True
+
+    # Q3. Is the Main Building's gold dome the only architectural feature with a religious character?
+    # Answer: False
+    # '''
 
     # new = '''
     # Q1. What type of character is the school architecturally?
@@ -128,6 +137,7 @@ def predict_questions(prompt, q_type, number):
     
         for i in range(0, number*3, 3):
             item = {
+                "id": int(i/3)+1,
                 "question" : result[i].split(".", 1)[1].strip(),
                 "choices" : result[i+1].split("Choices:", 1)[1].strip(),
                 "answer" : result[i+2].split("Answer:", 1)[1].split(".", 1)[0].strip()
@@ -139,6 +149,7 @@ def predict_questions(prompt, q_type, number):
         
         for i in range(0, number*2, 2):
             item = {
+                "id": int(i/2)+1,
                 "question" : result[i].split(".", 1)[1].strip(),
                 "answer" : result[i+1].split("Answer:", 1)[1].strip()
                 }
