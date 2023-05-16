@@ -17,6 +17,7 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 app = Flask(__name__)
 @app.route("/qgplugin/api/", methods = ["POST"])
 def get_questions():
+    print("INSIDE API")
     # Get JSON parameter
     json_data = request.get_data(as_text=True)
 
@@ -72,7 +73,7 @@ def prompt_creator2(content, num=1): #true or false
     return f"Generate {num} true or false questions and their answers as a list from the following text, {content} using the format 'Q1.' and 'Answer:'. Phrase statements in declarative form. Answers should be either True or False.\n\Statements and Answers:"
 
 def prompt_creator3(content, num=1): #multiple choice
-    return f"Generate a list of {num} multiple choice questions and their answers from the following text, {content} using the format 'Q1.','Choices: []' and 'Answer:'\n\nQuestions and Answers:"
+    return f"Create a list of {num} multiple choice questions and their answers from the following text, {content} using the format 'Q1.','Choices: []' and 'Answer:'\n\nQuestions and Answers:"
 
 
 # AI PREDICT FUNCTION
@@ -168,5 +169,11 @@ def predict_questions(prompt, q_type, number):
     return ques_bank_json
 
 
-if __name__ == '__main__':
-    app.run(debug = True, port = 2000)
+@app.route("/qgplugin/api/test/", methods = ["GET"])
+def test_print():
+    print("INSIDE API")
+    return "INSIDE API !!!!"
+
+
+# if __name__ == '__main__':
+#     app.run(debug = True, port = 2000)
