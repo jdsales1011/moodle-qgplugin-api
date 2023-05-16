@@ -177,3 +177,6 @@ def test_print():
 
 # if __name__ == '__main__':
 #     app.run(debug = True, port = 2000)
+
+if __name__ == '__main__':
+    app.run(debug=True, port=os.getenv("PORT", default=5000))
