@@ -168,7 +168,7 @@ def predict_questions(prompt, q_type, number):
     # Return a JSON 
     return ques_bank_json
 
-app = Flask(__name__)
+
 @app.route("/qgplugin/api/test/", methods = ["GET"])
 def test_print():
     print("INSIDE API")
