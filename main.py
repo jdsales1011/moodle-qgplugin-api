@@ -15,9 +15,9 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
 app = Flask(__name__)
-@app.route("/qgplugin/api/", methods = ["POST"])
+@app.route("/qgplugin/api/questions", methods = ["POST"])
 def get_questions():
-    print("INSIDE API")
+    print("INSIDE GET QUESTIONS!")
     # Get JSON parameter
     json_data = request.get_data(as_text=True)
 
