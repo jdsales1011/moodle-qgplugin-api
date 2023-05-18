@@ -78,94 +78,90 @@ def prompt_creator3(content, num=1): #multiple choice
 # AI PREDICT FUNCTION
 def predict_questions(prompt, q_type, number):
     result = []
-    openai.api_key = os.getenv("OPENAI_API_KEY")    
-    response = openai.Completion.create(
-        model="text-davinci-003",
-        prompt=prompt,
-        temperature=0.7,
-        max_tokens=256,
-        top_p=1,
-        frequency_penalty=0,
-        presence_penalty=0
-    )   
-    print("Response: ", response)
-    new = response['choices'][0]['text']
-    print(new)
 
-    # new = '''
-    # Q1. What was wrong with the computers? 
-    # Answer: Something had gone wrong with the computers. 
-    # Q2. Why did the speaker have to make another plan? 
-    # Answer: The speaker had to make another plan because the assistant had forgotten to make copies of a report needed at nine o'clock.
-    # Q3. Sakto ni?
-    # Answer: Maynta :'))
-    # '''
+    try:
+        openai.api_key = os.getenv("OPENAI_API_KEY")    
+        response = openai.Completion.create(
+            model="text-davinci-003",
+            prompt=prompt,
+            temperature=0.7,
+            max_tokens=256,
+            top_p=1,
+            frequency_penalty=0,
+            presence_penalty=0
+        )
+        new = response['choices'][0]['text']
 
-    # new = '''
-    # Q1. The school has a Catholic character?
-    # Answer: True 
+        result = new.split('\n')
 
-    # Q2. Is there a golden statue of the Virgin Mary atop the Main Building's gold dome?
-    # Answer: True
+    except openai.OpenAIError as e:
+        # Handle OpenAI API specific errors
+        return generate_error(500, f"OpenAI API error: {str(e)}")
 
-    # Q3. Is the Main Building's gold dome the only architectural feature with a religious character?
-    # Answer: False
-    # '''
+    except Exception as e:
+        # Handle other general exceptions
+        return generate_error(500, f"An error occurred while handling OpenAI request: : {str(e)}")
 
-    # new = '''
-    # Q1. What type of character is the school architecturally?
-    # Choices: [A. Catholic, B. Protestant, C. Jewish, D. Atheist]
-    # Answer: A. Catholic
 
-    # Q2. What is atop the Main Building's gold dome?
-    # Choices: [A. A cross, B. A bell, C. A golden statue of the Virgin Mary, D. A flag]
-    # Answer: C. A golden statue of the Virgin Mary
+    try:
+        ques_bank = []
 
-    # Q3. What color is the gold dome?
-    # Choices: [A. White, B. Blue, C. Green, D. Gold]
-    # Answer: D. Gold
-    # '''
+        result = [x for x in result if x.strip()]       # TO REMOVE EMPTY NEXT LINES
 
-    result = new.split('\n')
+        length = len(result)
 
-    ques_bank = []
+        if q_type == 3:             # MULTIPLE CHOICE
+            for i in range(0, length, 3):
+                item = {
+                    "id": int(i/3)+1,
+                    "question" : result[i].split(".", 1)[1].strip(),
+                    "choices" : result[i+1].split("Choices:", 1)[1].strip(),
+                    "answer" : result[i+2].split("Answer:", 1)[1].split(".", 1)[0].strip()
+                    }
+                ques_bank.append(item)
 
-    print(result)
+        else: 
+            for i in range(0, length, 2):
+                item = {
+                    "id": int(i/2)+1,
+                    "question" : result[i].split(".", 1)[1].strip(),
+                    "answer" : result[i+1].split("Answer:", 1)[1].strip()
+                    }
+                ques_bank.append(item)
 
-    result = [x for x in result if x.strip()]       # TO REMOVE EMPTY NEXT LINES
+        ques_bank_json = {
+            "status" : "success",
+            "questions": ques_bank,
+        }
 
-    length = len(result)
+        # Convert dict to JSON
+        ques_bank_json = json.dumps(ques_bank_json)
 
-    if q_type == 3:             # MULTIPLE CHOICE
-        for i in range(0, length, 3):
-            item = {
-                "id": int(i/3)+1,
-                "question" : result[i].split(".", 1)[1].strip(),
-                "choices" : result[i+1].split("Choices:", 1)[1].strip(),
-                "answer" : result[i+2].split("Answer:", 1)[1].split(".", 1)[0].strip()
-                }
-            ques_bank.append(item)
+        print("JSON RESULT: \n", ques_bank_json)
 
-    else: 
-        for i in range(0, length, 2):
-            item = {
-                "id": int(i/2)+1,
-                "question" : result[i].split(".", 1)[1].strip(),
-                "answer" : result[i+1].split("Answer:", 1)[1].strip()
-                }
-            ques_bank.append(item)
+        # Return a JSON 
+        return ques_bank_json
+    
+    except Exception as e:
+        # Handle other general exceptions
+        json_response = generate_error(500, f"An error occured during handling of response: {str(e)}")
+        print("RESPONSE: \n", json_response)
+        return json_response
 
-    ques_bank_json = {
-        "questions": ques_bank
+
+def generate_error(code, message):
+    error_json = {
+        "status" : "error",
+        "error" : {
+            "code" : code,
+            "message" : message,
+        }
     }
 
     # Convert dict to JSON
-    ques_bank_json = json.dumps(ques_bank_json)
+    error_json = json.dumps(error_json)
 
-    print("JSON RESULT: ", ques_bank_json)
-
-    # Return a JSON 
-    return ques_bank_json
+    return error_json
 
 
 @app.route("/qgplugin/api/test/", methods = ["GET"])
