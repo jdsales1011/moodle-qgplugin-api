@@ -1,5 +1,15 @@
+# ERROR RESPONSE
+data = {
+    "status" : "error",
+    "error" : {
+        "code" : 400,
+        "message" : "Invalid request data",
+    }
+}
+
 # IDENTIFICATION
 data = {
+    "status": "success",
     "questions": [
         {
             "id": 1,
@@ -16,6 +26,7 @@ data = {
 
 # TRUE OR FALSE
 data = {
+    "status": "success",
     "questions": [
         {
             "question": "Zaphod Beeblebrox",
@@ -30,6 +41,7 @@ data = {
 
 # MULTIPLE CHOICE
 data = {
+    "status": "success",
     "questions": [
         {
             "question": "Zaphod Beeblebrox?",
