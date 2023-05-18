@@ -9,6 +9,8 @@ import base64
 
 import openai
 import PyPDF2
+import docx
+
 
 os.environ['OPENAI_API_KEY']='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'
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -50,8 +52,14 @@ def get_questions():
             # Close BytesIO obj
             file_bytes.close()
 
-        elif (file_extension == "docx" or file_extension == "docs"):
-            print("docs")
+        elif (file_extension == "docx" or file_extension == "docs" or file_extension == "doc"):
+            file_bytes = io.BytesIO(file_decoded)
+            doc = docx.Document(file_bytes)
+            file_content += "\n".join([paragraph.text for paragraph in doc.paragraphs])
+            
+            # Close BytesIO obj
+            file_bytes.close()
+
 
     prompt_creators = {
         1: prompt_creator1(file_content, number),
@@ -80,17 +88,26 @@ def predict_questions(prompt, q_type, number):
     result = []
 
     try:
-        openai.api_key = os.getenv("OPENAI_API_KEY")    
-        response = openai.Completion.create(
-            model="text-davinci-003",
-            prompt=prompt,
-            temperature=0.7,
-            max_tokens=256,
-            top_p=1,
-            frequency_penalty=0,
-            presence_penalty=0
-        )
-        new = response['choices'][0]['text']
+        # openai.api_key = os.getenv("OPENAI_API_KEY")    
+        # response = openai.Completion.create(
+        #     model="text-davinci-003",
+        #     prompt=prompt,
+        #     temperature=0.7,
+        #     max_tokens=256,
+        #     top_p=1,
+        #     frequency_penalty=0,
+        #     presence_penalty=0
+        # )
+        # new = response['choices'][0]['text']
+
+        new = '''
+        Q1. What was wrong with the computers? 
+        Answer: Something had gone wrong with the computers. 
+        Q2. Why did the speaker have to make another plan? 
+        Answer: The speaker had to make another plan because the assistant had forgotten to make copies of a report needed at nine o'clock.
+        Q3. Sakto ni?
+        Answer: Maynta :'))
+        '''
 
         result = new.split('\n')
 
