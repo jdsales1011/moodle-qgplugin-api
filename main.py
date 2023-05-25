@@ -10,6 +10,7 @@ import base64
 import openai
 import PyPDF2
 import docx
+from pptx import Presentation
 
 
 os.environ['OPENAI_API_KEY']='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'
@@ -60,6 +61,18 @@ def get_questions():
             # Close BytesIO obj
             file_bytes.close()
 
+        elif (file_extension == "ppt" or file_extension == "pptx"):
+            # Convert contents to bytes (BytesIO obj)
+            file_bytes = io.BytesIO(file_decoded)
+
+            prs = Presentation(file_bytes)
+            for slide in prs.slides:
+                for shape in slide.shapes:
+                    if hasattr(shape, "text"):
+                        file_content += shape.text + "\n"
+
+            # Close BytesIO obj
+            file_bytes.close()
 
     prompt_creators = {
         1: prompt_creator1(file_content, number),
@@ -88,26 +101,17 @@ def predict_questions(prompt, q_type, number):
     result = []
 
     try:
-        # openai.api_key = os.getenv("OPENAI_API_KEY")    
-        # response = openai.Completion.create(
-        #     model="text-davinci-003",
-        #     prompt=prompt,
-        #     temperature=0.7,
-        #     max_tokens=256,
-        #     top_p=1,
-        #     frequency_penalty=0,
-        #     presence_penalty=0
-        # )
-        # new = response['choices'][0]['text']
-
-        new = '''
-        Q1. What was wrong with the computers? 
-        Answer: Something had gone wrong with the computers. 
-        Q2. Why did the speaker have to make another plan? 
-        Answer: The speaker had to make another plan because the assistant had forgotten to make copies of a report needed at nine o'clock.
-        Q3. Sakto ni?
-        Answer: Maynta :'))
-        '''
+        openai.api_key = os.getenv("OPENAI_API_KEY")    
+        response = openai.Completion.create(
+            model="text-davinci-003",
+            prompt=prompt,
+            temperature=0.7,
+            max_tokens=256,
+            top_p=1,
+            frequency_penalty=0,
+            presence_penalty=0
+        )
+        new = response['choices'][0]['text']
 
         result = new.split('\n')
 
