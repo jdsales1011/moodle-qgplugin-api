@@ -12,8 +12,6 @@ import PyPDF2
 import docx
 from pptx import Presentation
 
-
-os.environ['OPENAI_API_KEY']='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'
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
